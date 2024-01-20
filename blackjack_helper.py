@@ -1,9 +1,10 @@
 import random
+from random import randint
 
-#This contains the deck of cards for the players
+# This contains the deck of cards for the players
 deck = {
-        1: 4, 2: 4, 3: 4, 4: 4, 5: 4, 6: 4, 7: 4, 8: 4, 9: 4, 10: 4, 11: 4, 12: 4, 13: 4
-     }
+    1: 4, 2: 4, 3: 4, 4: 4, 5: 4, 6: 4, 7: 4, 8: 4, 9: 4, 10: 4, 11: 4, 12: 4, 13: 4
+}
 
 player_name_pool = {
     'Lily', 'Hannah', 'Caroline', 'Samuel', 'Caleb', 'Stella', 'Ava', 'Maya', 'Eleanor', 'Ivy', 'Zoey',
@@ -15,8 +16,12 @@ player_name_pool = {
     'Isaiah', 'Ruby', 'Jack', 'Benjamin', 'Riley', 'Claire', 'Cooper', 'Addison', 'Liam'
 }
 
+
 def draw_card():
     hand = randint(1, 13)
+    while deck[hand] == 0:
+        hand = randint(1, 13)
+    deck[hand] -= 1
     if hand == 1:
         value = 11
         print('Drew an Ace.')
@@ -37,11 +42,17 @@ def draw_card():
         value = hand
     return [value, hand]
 
-def valid_num(str):
-    for char in str:
+
+def valid_num(strs):
+    for char in strs:
         if char not in '0123456789':
             return False
     return True
+
+def print_header(message):
+    print('---------------')
+    print(message)
+    print('---------------')
 
 class Player:
 
@@ -51,10 +62,11 @@ class Player:
         self.chips = 100
         self.bet = None
         self.hand = []
+        self.current_hand = None
 
     def first_turn(self):
         store = draw_card()
-        self.current_hand += store[0]
+        self.current_hand = store[0]
         self.hand.append(store[1])
         store = draw_card()
         self.current_hand += store[0]
@@ -73,11 +85,22 @@ class Player:
             self.current_hand += store[0]
         self.hand.append(store[1])
 
+    def print_status(self):
+        print(f"You have {self.current_hand}.", end='')
+
+    def end_turn(self):
+        print('{} has {}.'.format(self.name, self.current_hand))
+        if self.current_hand == 21:
+            print('Blackjack!')
+        elif self.current_hand > 21:
+            print('Bust.')
+
+
 class Bot(Player):
 
-    def __init__(self):
-        self.name = random.choice(list(player_name_pool))
+    def __init__(self, name):
+        super().__init__(name)
         self.chips = 100
-        self.hand = []
 
-
+    def print_status(self):
+        print(f"{self.name} has {self.current_hand}.")
