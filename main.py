@@ -13,19 +13,19 @@ def run_game():
     player3 = Bot(random.choice(list(player_name_pool)))
     player_list = [player1, player2, player3]
     print("Today you will be playing with {}, {} and {}!".format(player1.name, player2.name, player3.name))
-    user_bet = input("You have {} chips left! Please place a bet ".format(user.chips))
+    user_bet = input("You have {} chips left! Please place a bet: ".format(user.chips))
 
     # This while loop is to ensure a valid bet is placed
     while not valid_num(user_bet):
         print("Invalid number! Make sure to input an integer within the range of 20 to 100")
-        user_bet = input("You have {} chips left! Place a bet ".format(user.chips))
+        user_bet = input("You have {} chips left! Place a bet: ".format(user.chips))
         if valid_num(user_bet):
             while int(user_bet) < 20 or int(user_bet) > user.chips:
                 if int(user_bet) < 20:
                     print("A minimum of 20 chips is allowed for entry!")
-                    user_bet = input("You have {} chips left! Place a bet ".format(user.chips))
+                    user_bet = input("You have {} chips left! Place a bet: ".format(user.chips))
                 elif int(user_bet) > user.chips:
-                    user_bet = input("You have only {} chips left! Place a bet ".format(user.chips))
+                    user_bet = input("You have only {} chips left! Place a bet: ".format(user.chips))
                 if not valid_num(user_bet):
                     break
     user_bet = int(user_bet)
@@ -59,11 +59,13 @@ def run_game():
                 user.print_status()
                 user_turn = input(' Hit (y/n)? ').lower()
 
+    user.print_status()
     user.end_turn()
+    print()
 
     # Other Player's turn
     for player in player_list:
-        print_header(f'{player.name}\'s Turn!' )
+        print_header(f'{player.name}\'s Turn!')
         player.first_turn()
         if player.current_hand >= 21:
             player.end_turn()
@@ -73,12 +75,33 @@ def run_game():
             print(f'{player.name} has decided to stay!')
             player.print_status()
             continue
+        player.print_status()
         while response == 1 and player.current_hand < 21:
             print(f"{player.name} has decided to hit!")
             player.draw_hand()
             player.print_status()
             response = randint(0, 1)
         player.end_turn()
+
+    # It's time for the dealer to play
+    print_header("Dealer's Turn!")
+    dealer = Dealer()
+    dealer.first_turn()
+
+    while dealer.current_hand < 17:
+        dealer.end_turn()
+        dealer.draw_hand()
+    dealer.end_turn()
+
+    # Time to announce the results and distribute the bet
+    print_header("Game Results")
+    for index in range(len(player_list) - 1, -1, -1):
+        result = determine_winner(player_list[index].current_hand, dealer.current_hand)
+        player_list[index].result(dealer, result)
+
+    # Player's result
+    result = determine_winner(user.current_hand, dealer.current_hand)
+    user.result(dealer, result)
 
 
 run_game()
