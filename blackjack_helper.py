@@ -73,14 +73,16 @@ def determine_winner(score, dealer):
 class Player:
 
     # player can put in custom name
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
+        self.name = None
+        self.previous = 100
         self.chips = 100
         self.bet = None
         self.fate = False
         self.hand = []
         self.current_hand = None
         self.earned = None
+        self.times_played = 0
 
     def first_turn(self):
         store = draw_card()
@@ -153,7 +155,8 @@ class Player:
 class Bot(Player):
 
     def __init__(self, name):
-        super().__init__(name)
+        super().__init__()
+        self.name = name
         self.chips = 100
 
     def print_status(self):
